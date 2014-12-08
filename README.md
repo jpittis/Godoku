@@ -6,7 +6,7 @@ Though I've written a Sudoku solver before, this one attempts to follow good cod
 
 ####Status: Complete
 
-####Instructions
+####Use Instructions
 
 Only the executable binary ```godoku``` is required to use this Sudoku solver.
 
