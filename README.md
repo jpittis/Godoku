@@ -6,6 +6,4 @@ Though I've written a sudoku solver before, this one attempts to follow good cod
 
 ####Status: Not Complete
 ####TODO
-* Add proper Go error messages.
-* Refactor less clear functions.
-* Make main test function less of a mess.
+* Allow for sudoku file to be entered via command line arguments.
