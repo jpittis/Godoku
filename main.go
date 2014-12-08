@@ -3,10 +3,9 @@ A sudoku solver written in Go.
 
 Jake Pittis, December 2014
 
-The goal of this project is to remind me how fun
-programming in Go can be! Though I've written a
-sudoku solver before, this one attempts to follow
-good coding practices as well as proper Go style. */
+Though I've written a sudoku solver before, this
+one attempts to follow good coding practices as
+well as proper Go style. */
 
 package main
 
@@ -14,6 +13,7 @@ import (
     "fmt"
     "io/ioutil"
     "errors"
+    "os"
 )
 
 /* Read in a sudoku file, return converted to an integer array. */
@@ -36,7 +36,7 @@ func newSudoku(fileName string) ([9][9]int, error) {
 func readSudoku(fileName string) (string, error) {
     data, err := ioutil.ReadFile(fileName)
     if err != nil {
-        return string(data), errors.New("Error when reading file containing sudoku.")
+        return string(data), fmt.Errorf("Error when reading file '%s' containing sudoku.", fileName)
     } else {
         return string(data), nil
     }
@@ -170,7 +170,14 @@ func nextIndex(x int, y int) (int, int) {
 
 /* Solves sudoku puzzle found in filename. */
 func main() {
-    fileName := "sudoku.txt"
+    args := os.Args
+    var fileName string
+
+    if len(args) <= 1 {
+        fileName = "sudoku.txt"
+    } else {
+        fileName = args[1]
+    }
 
     sudoku, err := newSudoku(fileName)
     if err != nil {
