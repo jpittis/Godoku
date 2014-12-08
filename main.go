@@ -13,34 +13,37 @@ package main
 import (
     "fmt"
     "io/ioutil"
+    "errors"
 )
 
-/* TODO: This is only for temporary error handling! */
-func check(err error) {
+/* Read in a sudoku file, return converted to an integer array. */
+func newSudoku(fileName string) ([9][9]int, error) {
+    sudoku := [9][9]int{}
+
+    data, err := readSudoku(fileName)
     if err != nil {
-        panic(err)
+        return sudoku, err
+    }
+
+    err = parseSudoku(&sudoku, data)
+    if err != nil {
+        return sudoku, err
+    }
+    return sudoku, nil
+}
+
+/* Read in a sudoku file. */
+func readSudoku(fileName string) (string, error) {
+    data, err := ioutil.ReadFile(fileName)
+    if err != nil {
+        return string(data), errors.New("Error when reading file containing sudoku.")
+    } else {
+        return string(data), nil
     }
 }
 
-/* Read in a sudoku file, return converted to an integer array. */
-func newSudoku(fileName string) [9][9]int {
-    sudoku := [9][9]int{}
-    data := readSudoku(fileName)
-    parseSudoku(&sudoku, data)
-    return sudoku
-}
-
-/* Read in a sudoku file.
-TODO: handle file errors */
-func readSudoku(fileName string) string {
-    data, err := ioutil.ReadFile(fileName)
-    check(err)
-    return string(data)
-}
-
-/* Check and place given data into double int array sudoku.
-TODO: handle <81 and >81 errors */
-func parseSudoku(sudoku *[9][9]int, data string) {
+/* Check and place given data into double int array sudoku. */
+func parseSudoku(sudoku *[9][9]int, data string) error {
     numbersParsed := 0
     for i := 0; i < len(data); i++ {
         if data[i] >= '0' && data[i] <= '9' && numbersParsed < 81 {
@@ -48,6 +51,10 @@ func parseSudoku(sudoku *[9][9]int, data string) {
             numbersParsed++
         }
     }
+    if numbersParsed != 81 {
+        return errors.New("Input file must have exactly 81 numbers to be a valid sudoku puzzle.")
+    }
+    return nil
 }
 
 /* Print a formated sudoku. */
@@ -116,10 +123,14 @@ func checkColumn(sudoku *[9][9]int, x int, y int, value int) bool {
     return true
 }
 
-/* Start solving the given sudoku recursively.
-TODO: check sudoku and produce an error if not properly solved*/
-func solveSudoku(sudoku *[9][9]int) {
+/* Start solving the given sudoku recursively. */
+func solveSudoku(sudoku *[9][9]int) error {
     solveRecursive(sudoku, 0, 0)
+    if checkSudoku(sudoku) {
+        return nil
+    } else {
+        return errors.New("Attempt to solve sudoku has failed. Maybe the puzzle inputed has no solution!")
+    }
 }
 
 /* Recursive function for solving sudoku. */
@@ -160,17 +171,18 @@ func nextIndex(x int, y int) (int, int) {
 /* Solves sudoku puzzle found in filename. */
 func main() {
     fileName := "sudoku.txt"
-    sudoku := newSudoku(fileName)
-    fmt.Print("-Given-----------\n")
-    printSudoku(&sudoku)
-    solveSudoku(&sudoku)
-    fmt.Print("-Produced--------\n")
-    printSudoku(&sudoku)
-    fmt.Print("-----------------\n")
-    if checkSudoku(&sudoku) {
-        fmt.Print("Correct Solution!\n")
-    } else {
-        fmt.Print("Something went wrong!\n")
+
+    sudoku, err := newSudoku(fileName)
+    if err != nil {
+        fmt.Print("Error: ", err.Error(), "\n")
+        return
     }
-    fmt.Print("-----------------\n")
+
+    err = solveSudoku(&sudoku)
+    if err != nil {
+        fmt.Print("Error: ", err.Error(), "\n")
+        return
+    }
+
+    printSudoku(&sudoku)
 }
