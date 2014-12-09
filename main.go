@@ -81,10 +81,9 @@ func checkSudoku(sudoku *[9][9]int) bool {
 
 /* Returns true if value placed at x, y is a valid sudoku move. */
 func checkAll(sudoku *[9][9]int, x int, y int, value int) bool {
-    notInSquare := checkSquare(sudoku, x, y, value)
-    notInRow := checkRow(sudoku, x, y, value)
-    notInColumn := checkColumn(sudoku, x, y, value)
-    return notInSquare && notInRow && notInColumn
+    return checkSquare(sudoku, x, y, value) &&
+    checkRow(sudoku, x, y, value) &&
+    checkColumn(sudoku, x, y, value)
 }
 
 /* Returns false if value already exists in the 3 by 3 square. */
